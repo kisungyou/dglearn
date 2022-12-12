@@ -1,0 +1,14 @@
+Package: dglearn
+Type: Package
+Title: Learning with Diffusion Geometry
+Version: 0.1.0
+Authors@R: c(person("Kisung", "You", role = c("aut", "cre"), email = "kisungyou@outlook.com",comment=c(ORCID="0000-0002-8584-459X")))
+Description: More details about what the package does. See
+             <http://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file> for details on how
+             to write this part.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RdMacros: Rdpack
+RoxygenNote: 7.2.2
+Imports: Rcpp (>= 1.0.9), Rdpack, stats
+LinkingTo: Rcpp, RcppArmadillo
