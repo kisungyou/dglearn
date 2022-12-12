@@ -2,11 +2,49 @@
 % Please edit documentation in R/interface_dist4randomForest.R
 \name{dist4randomForest}
 \alias{dist4randomForest}
-\title{Extract Distance from Random Forest Objects}
+\title{Compute Distance for Query Data and a 'randomForest' Object}
 \usage{
-dist4randomForest(rfobj, newdata, dtype = c("proximity", "geodesic"))
+dist4randomForest(forest, query, dtype = c("proximity", "geodesic"))
+}
+\arguments{
+\item{forest}{a S3 class \code{randomForest} object.}
+
+\item{query}{a \code{data.frame} of \eqn{m} observations whose distance will be computed.}
+
+\item{dtype}{name of the distance; either \code{"proximity"} or \code{"geodesic"} (default: \code{"proximity"}).}
+}
+\value{
+an object of \code{\link{dist}} class for \eqn{m} observations in a query.
 }
 \description{
-Extract Distance from Random Forest Objects
+Given an object of S3 class \code{randomForest} and a query data for prediction, 
+compute the distance among samples in a query induced by the given random forest. 
+Currently, no \code{NA} value is allowed in a query dataset.
+}
+\examples{
+\donttest{
+## load the 'iris' data for classification
+data("iris")
+iris.df = as.data.frame(iris)
+
+## set seed for replicability
+set.seed(496)
+
+## fit the randomForest classification model with default settings
+iris.rf = randomForest::randomForest(Species ~ ., data=iris.df)
+
+## compute two types of distances
+dP = dist4randomForest(iris.rf, iris.df, dtype="proximity")
+dG = dist4randomForest(iris.rf, iris.df, dtype="geodesic")
+
+## visualize two distance matrices
+opar <- par(no.readonly=TRUE)
+par(mfrow=c(1,2), pty="s")
+image(as.matrix(dP), xaxt='n', yaxt='n', main="dtype='proximity'")
+image(as.matrix(dG), xaxt='n', yaxt='n', main="dtype='geodesic'")
+par(opar)
+}
+
+
 }
 \concept{interface}

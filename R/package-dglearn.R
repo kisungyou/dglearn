@@ -3,7 +3,9 @@
 #' @docType package
 #' @noRd
 #' @import Rdpack
-#' @importFrom stats rnorm dist
+#' @import randomForest
+#' @importFrom igraph distances graph_from_adjacency_matrix
+#' @importFrom stats rnorm dist as.dist
 #' @importFrom Rcpp evalCpp
 #' @useDynLib dglearn
 NULL
