@@ -3,6 +3,7 @@
 export(dist4randomForest)
 export(dsmdist)
 export(dsmdist2)
+export(findsteps)
 export(matpower)
 import(Rdpack)
 import(randomForest)

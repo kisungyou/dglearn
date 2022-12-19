@@ -74,3 +74,17 @@ dsmdist <- function(Plist){
   # return
   return(output)
 }
+
+# direct access -----------------------------------------------------------
+#' @keywords internal
+#' @noRd
+nocheck_dsmdist <- function(Plist){
+  N = length(Plist)
+  output = array(0,c(N,N))
+  for (i in 1:(N-1)){
+    for (j in (i+1):N){
+      output[i,j] <- output[j,i] <- src_dsm_dist2diff(Plist[[i]], Plist[[j]])
+    }
+  }
+  return(output)
+}

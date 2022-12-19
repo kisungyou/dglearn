@@ -48,3 +48,11 @@ dsmdist2 <- function(P1, P2){
   # COMPUTE AND RETURN
   return(as.double(src_dsm_dist2diff(P1,P2)))
 }
+
+
+# direct access -----------------------------------------------------------
+#' @keywords internal
+#' @noRd
+nocheck_dsmdist2 <- function(P1, P2){
+  return(as.double(src_dsm_dist2diff(P1,P2)))
+}
