@@ -5,7 +5,7 @@
 #' @import Rdpack
 #' @import randomForest
 #' @importFrom igraph distances graph_from_adjacency_matrix
-#' @importFrom stats rnorm dist as.dist
+#' @importFrom stats rnorm dist as.dist median
 #' @importFrom Rcpp evalCpp
 #' @useDynLib dglearn
 NULL

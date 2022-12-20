@@ -11,6 +11,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// src_affgaussian
+arma::mat src_affgaussian(arma::mat& X, bool use_auto, double bandwidth);
+RcppExport SEXP _dglearn_src_affgaussian(SEXP XSEXP, SEXP use_autoSEXP, SEXP bandwidthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_auto(use_autoSEXP);
+    Rcpp::traits::input_parameter< double >::type bandwidth(bandwidthSEXP);
+    rcpp_result_gen = Rcpp::wrap(src_affgaussian(X, use_auto, bandwidth));
+    return rcpp_result_gen;
+END_RCPP
+}
 // src_dsm_dist2diff
 double src_dsm_dist2diff(arma::mat& Px, arma::mat& Py);
 RcppExport SEXP _dglearn_src_dsm_dist2diff(SEXP PxSEXP, SEXP PySEXP) {
@@ -39,6 +52,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_dglearn_src_affgaussian", (DL_FUNC) &_dglearn_src_affgaussian, 3},
     {"_dglearn_src_dsm_dist2diff", (DL_FUNC) &_dglearn_src_dsm_dist2diff, 2},
     {"_dglearn_src_dsm_spheremean", (DL_FUNC) &_dglearn_src_dsm_spheremean, 4},
     {NULL, NULL, 0}
