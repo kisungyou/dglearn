@@ -2,8 +2,8 @@
 #' 
 #' @docType package
 #' @noRd
-#' @import Rdpack
 #' @import randomForest
+#' @importFrom Rdpack reprompt
 #' @importFrom igraph distances graph_from_adjacency_matrix
 #' @importFrom stats rnorm dist as.dist median
 #' @importFrom Rcpp evalCpp

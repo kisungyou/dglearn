@@ -1,13 +1,13 @@
-#' Affinity by Gaussian Kernel
+#' Affinity by Adaptive Kernel by Zelnik-Manor and Perona (2005)
 #' 
-#' The standard method for constructing the affinity matrix is to use Gaussian kernel. 
-#' When two points \eqn{x_i} and \eqn{x_j} are given, the affinity is computed as 
-#' \deqn{A_{ij} = \exp(-\|x_i - x_j\|^2 / 2\epsilon^2)} 
-#' for a bandwidth parameter \eqn{\epsilon}. When the option \code{bandwidth="auto"} is used, 
-#' \eqn{\epsilon} is chosen in an ad hoc manner.
+#' \insertCite{zelnik-manor_self-tuning_2005;textual}{dglearn} proposed to define data-driven bandwidth parameters 
+#' using the nearest-neighbor distances. Let \eqn{\sigma_i} be the distance from a point \eqn{x_i} to its \code{nnbd}-th 
+#' nearest neighbor. Then the affinity matrix is defined as
+#' \deqn{A_{ij} = \exp(-\|x_i - x_j\|^2 / \sigma_i \sigma_j)} 
+#' so that it reflects density of the data. 
 #' 
 #' @param X an \eqn{(m\times p)} matrix of row-stacked observations of S3 \code{dist} object of \eqn{m} observations.
-#' @param bandwidth \eqn{\epsilon} value or \code{"auto"}.
+#' @param nbdk neighborhood size to define data-driven bandwidth parameter (default: 5).
 #' @param ... extra parameters including \describe{
 #' \item{alpha}{normalization constant; one of \code{c(0, 0.5, 1)} (default: \code{0}).}
 #' \item{zero.diag}{a logical; set the diagonal entries as zeros (default: \code{FALSE}).}
@@ -23,39 +23,32 @@
 #' ## extract the numerical part
 #' iris_mat = as.matrix(iris[,1:4])
 #' 
-#' ## compute affinity using different scales
-#' aff1 = affgaussian(iris_mat, bandwidth=0.1)
-#' aff2 = affgaussian(iris_mat, bandwidth=1)
-#' aff3 = affgaussian(iris_mat, bandwidth="auto")
+#' ## compute affinity using different neighbor sizes
+#' aff1 = aff05Z(iris_mat, nbdk=5)
+#' aff2 = aff05Z(iris_mat, nbdk=10)
+#' aff3 = aff05Z(iris_mat, nbdk=20)
 #' 
 #' ## visualize
 #' opar <- par(no.readonly=TRUE)
 #' par(mfrow=c(1,3), pty="s")
-#' image(aff1, xaxt="n", yaxt="n", xlab="", ylab="", main='bandwidth=0.1')
-#' image(aff2, xaxt="n", yaxt="n", xlab="", ylab="", main='bandwidth=1')
-#' image(aff3, xaxt="n", yaxt="n", xlab="", ylab="", main='bandwidth="auto"')
+#' image(aff1, xaxt="n", yaxt="n", xlab="", ylab="", main='nbdk=5')
+#' image(aff2, xaxt="n", yaxt="n", xlab="", ylab="", main='nbdk=10')
+#' image(aff3, xaxt="n", yaxt="n", xlab="", ylab="", main='nbdk=20')
 #' par(opar)
 #' }
 #' 
+#' @references 
+#' \insertAllCited{}
+#' 
 #' @concept affinity
 #' @export
-affgaussian <- function(X, bandwidth="auto", ...){
+aff05Z <- function(X, nbdk=5, ...){
   # ---------------------------------------------------------------
   # PREP
   # explicit
-  if (is.character(bandwidth)){
-    if (identical(bandwidth,"auto")){
-      par_auto = TRUE
-      par_bandwidth = 1
-    } else {
-      stop("* affgaussian : 'bandwidth' is invalid. Use 'auto' or numeric option.")
-    }
-  } else {
-    par_auto = FALSE
-    par_bandwidth = as.double(bandwidth)
-    if ((length(par_bandwidth)>1)||(!is.finite(par_bandwidth))||(par_bandwidth<.Machine$double.eps)){
-      stop("* affgaussian : 'bandwidth' should be a nonnegative real number.")
-    }
+  par_nbdk = max(1, round(nbdk))
+  if ((par_nbdk<1)||(is.infinite(par_nbdk))||(!is.numeric(par_nbdk))){
+    stop("* aff05Z : 'nbdk' should be a positive integer.")
   }
   
   # implicit
@@ -79,11 +72,11 @@ affgaussian <- function(X, bandwidth="auto", ...){
   # ---------------------------------------------------------------
   # CASE BRANCHING BY TYPE OF X : 'dist' or 'matrix
   if (inherits(X, "dist")){
-    output = affgaussian_dist(X, par_auto, par_bandwidth)
+    output = aff05Z_dist(X, par_nbdk)
   } else if (is.matrix(X)){
-    output = src_affgaussian(X, par_auto, par_bandwidth)
+    output = aff05Z_mat(X, par_nbdk)
   } else {
-    stop("* affgaussian : 'X' should be either a 'dist' class object or a 'matrix'.")
+    stop("* aff05Z : 'X' should be either a 'dist' class object or a 'matrix'.")
   }
   
   # ---------------------------------------------------------------
@@ -110,16 +103,34 @@ affgaussian <- function(X, bandwidth="auto", ...){
 
 
 
-# use R when 'dist' comes in ----------------------------------------------
+# auxiliary for branching -------------------------------------------------
 #' @keywords internal
 #' @noRd
-affgaussian_dist <- function(matD, use_auto, bandwidth){
-  if (use_auto){ # automatic case
-    mval = as.double(stats::median(matD))
-    output = exp(-((as.matrix(matD)^2)/(2*(mval^2)))) 
-  } 
-  else {         # otherwise
-    output = exp(-((as.matrix(matD)^2)/(2*(bandwidth^2)))) 
+aff05Z_dist <- function(distobj, nbdk){
+  x = as.matrix(distobj)
+  n = base::nrow(x)
+  par_k = max(1, round(nbdk))
+  
+  # k-th nearest neighbor distance
+  nndist = rep(0, n)
+  for (i in 1:n){
+    tgt = as.vector(x[i,])
+    nndist[i] = tgt[order(tgt)[nbdk+1]]
   }
-  return(output)
+  
+  # build kernel & affinity
+  matK = array(1, c(n,n))
+  for (i in 1:(n-1)){
+    for (j in (i+1):n){
+      matK[i,j] <- matK[j,i] <- exp(-((x[i,j])^2)/(nndist[i]*nndist[j]))
+    }
+  }
+  
+  # return
+  return(matK)
+}
+#' @keywords internal
+#' @noRd
+aff05Z_mat <- function(X, nbdk){
+  return(aff05Z_dist(stats::dist(X), nbdk))
 }

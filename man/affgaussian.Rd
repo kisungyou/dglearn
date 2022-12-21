@@ -4,12 +4,17 @@
 \alias{affgaussian}
 \title{Affinity by Gaussian Kernel}
 \usage{
-affgaussian(X, bandwidth = "auto")
+affgaussian(X, bandwidth = "auto", ...)
 }
 \arguments{
 \item{X}{an \eqn{(m\times p)} matrix of row-stacked observations of S3 \code{dist} object of \eqn{m} observations.}
 
 \item{bandwidth}{\eqn{\epsilon} value or \code{"auto"}.}
+
+\item{...}{extra parameters including \describe{
+\item{alpha}{normalization constant; one of \code{c(0, 0.5, 1)} (default: \code{0}).}
+\item{zero.diag}{a logical; set the diagonal entries as zeros (default: \code{FALSE}).}
+}}
 }
 \value{
 an \eqn{(m\times m)} affinity matrix of \code{"affinity"} class.
@@ -17,7 +22,7 @@ an \eqn{(m\times m)} affinity matrix of \code{"affinity"} class.
 \description{
 The standard method for constructing the affinity matrix is to use Gaussian kernel. 
 When two points \eqn{x_i} and \eqn{x_j} are given, the affinity is computed as 
-\deqn{A_{ij} = \exp(-d(x_i, d_j)^2 / 2\epsilon^2)} 
+\deqn{A_{ij} = \exp(-\|x_i - x_j\|^2 / 2\epsilon^2)} 
 for a bandwidth parameter \eqn{\epsilon}. When the option \code{bandwidth="auto"} is used, 
 \eqn{\epsilon} is chosen in an ad hoc manner.
 }
