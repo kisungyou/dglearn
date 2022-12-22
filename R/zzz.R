@@ -1,0 +1,21 @@
+.onAttach <- function(...){
+  ## Retrieve Year Information
+  date <- date()
+  x <- regexpr("[0-9]{4}", date)
+  this.year <- substr(date, x[1], x[1] + attr(x, "match.length") - 1)
+  
+  # Retrieve Current Version
+  this.version = utils::packageVersion("dglearn")
+  
+  ## Print on Screen
+  packageStartupMessage("** ------------------------------------------------------- **")
+  packageStartupMessage("**       dglearn || Learning with Diffusion Geometry")
+  packageStartupMessage("**")
+  packageStartupMessage("** Version    : ",this.version,"       (",this.year,")",sep="")
+  packageStartupMessage("** Maintainer : Kisung You  (kisungyou@outlook.com)")
+  packageStartupMessage("** ------------------------------------------------------- **")
+}
+
+.onUnload <- function(libpath) {
+  library.dynam.unload("dglearn", libpath)
+}
