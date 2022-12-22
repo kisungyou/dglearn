@@ -3,7 +3,10 @@
 #' @docType package
 #' @noRd
 #' @import randomForest
+#' @import maotai 
+#' @importFrom utils getFromNamespace
 #' @importFrom Rdpack reprompt
+#' @importFrom RSpectra eigs
 #' @importFrom igraph distances graph_from_adjacency_matrix
 #' @importFrom stats rnorm dist as.dist median
 #' @importFrom Rcpp evalCpp

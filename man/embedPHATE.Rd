@@ -4,9 +4,68 @@
 \alias{embedPHATE}
 \title{Embedding by PHATE}
 \usage{
-embedPHATE(A)
+embedPHATE(A, ndim = 2, tsteps = "auto", potential = c("log", "sqrt"))
+}
+\arguments{
+\item{A}{an \eqn{(m\times m)} affinity matrix of \code{"affinity"} class.}
+
+\item{ndim}{an integer-valued target dimension (default: 2).}
+
+\item{tsteps}{an integer-valued timescale for smoothing or \code{"auto"} to automatically detect an optimal balancing timescale (default: \code{"auto"}).}
+
+\item{potential}{type of potential distance transformation; \code{"log"} or \code{"sqrt"} (default: \code{"log"}).}
+}
+\value{
+a named list containing \describe{
+\item{Y}{an \eqn{(m\times ndim)} matrix whose rows are embedded observations.}
+\item{tsteps}{when \code{tsteps="auto"}, it returns an optimal balancing timescale. Otherwise, it is identical to the input parameter of same name.}
+}
 }
 \description{
-Embedding by PHATE
+Potential of Heat Diffusion for Affinity-based Transition Embedding (PHATE) 
+is a variant of Diffusion Maps proposed by \insertCite{moon_visualizing_2019;textual}{dglearn}. 
+Given an arbitrary affinity matrix computed by \code{aff*} functions in the \pkg{dglearn} package, 
+it computes a low-dimensional embedding as described in the paper.
+}
+\examples{
+\donttest{
+## load 'iris' data
+data("iris")
+
+## extract the numerical part and label
+iris_mat = as.matrix(iris[,1:4])
+iris_lab = as.factor(iris[,5])
+
+## compute multiple affinities for data-driven kernels
+aff1 = dglearn::aff05Z(iris_mat, nbdk=5)
+aff2 = dglearn::aff05Z(iris_mat, nbdk=10)
+aff3 = dglearn::aff05Z(iris_mat, nbdk=20)
+
+## run PHATE with automatic stepsize rule
+ph1 = dglearn::embedPHATE(aff1)
+ph2 = dglearn::embedPHATE(aff2)
+ph3 = dglearn::embedPHATE(aff3)
+
+## step size information
+mm1 = paste0("nbdk=5:stepsize=", ph1$tsteps)
+mm2 = paste0("nbdk=10:stepsize=",ph2$tsteps)
+mm3 = paste0("nbdk=20:stepsize=",ph3$tsteps)
+
+## visualize
+opar <- par(no.readonly=TRUE)
+par(mfrow=c(1,3), pty="s")
+plot(ph1$Y, col=iris_lab, cex=0.5, pch=19, asp=1, main=mm1)
+plot(ph2$Y, col=iris_lab, cex=0.5, pch=19, asp=1, main=mm2)
+plot(ph3$Y, col=iris_lab, cex=0.5, pch=19, asp=1, main=mm3)
+par(opar)
+}
+
+
+}
+\references{
+\insertAllCited{}
+}
+\seealso{
+\code{\link{findsteps}}.
 }
 \concept{embedding}

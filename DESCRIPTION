@@ -10,5 +10,5 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 RdMacros: Rdpack
 RoxygenNote: 7.2.3
-Imports: Rcpp (>= 1.0.9), Rdpack, igraph, randomForest, stats
+Imports: Rcpp (>= 1.0.9), Rdpack, RSpectra, igraph, maotai, randomForest, stats, utils
 LinkingTo: Rcpp, RcppArmadillo
