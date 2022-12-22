@@ -1,5 +1,17 @@
 #' Embedding by Diffusion Maps
 #' 
+#' Diffusion Maps \insertCite{coifman_geometric_2005,coifman_diffusion_2006}{dglearn} is a nonlinear manifold learning technique based on an idea 
+#' to approximate the diffusion process on data manifold. Unlike the full implementation 
+#' available in other packages like \pkg{Rdimtools} or \pkg{diffusionMap}, this code 
+#' uses a precomputed affinity matrix by one of \code{aff*} functions in the \pkg{dglearn} package. 
+#' 
+#' @param A an \eqn{(m\times m)} affinity matrix of \code{"affinity"} class.
+#' @param ndim an integer-valued target dimension (default: 2).
+#' @param tsteps an integer-valued timescale for smoothing (default: 1).
+#' 
+#' @return a named list containing \describe{
+#' \item{Y}{an \eqn{(m\times ndim)} matrix whose rows are embedded observations.}
+#' }
 #' 
 #' @examples 
 #' \donttest{
@@ -26,6 +38,9 @@
 #' plot(dm3, col=iris_lab, cex=0.5, pch=19, asp=1, main="tsteps=5")
 #' par(opar)
 #' }
+#' 
+#' @references 
+#' \insertAllCited{}
 #' 
 #' @concept embedding
 #' @export
